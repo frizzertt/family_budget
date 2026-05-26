@@ -3,6 +3,15 @@
 -- Основная сущность purchase_payments заполняется 1 000 000 записей.
 
 SET search_path TO family_budget, public;
+SET client_min_messages TO WARNING;
+
+DROP INDEX IF EXISTS idx_family_members_family;
+DROP INDEX IF EXISTS idx_products_type;
+DROP INDEX IF EXISTS idx_accounts_member;
+DROP INDEX IF EXISTS idx_income_member_date;
+DROP INDEX IF EXISTS idx_purchase_member_date;
+DROP INDEX IF EXISTS idx_purchase_product_date;
+DROP INDEX IF EXISTS idx_purchase_account;
 
 TRUNCATE TABLE
     purchase_payments,
@@ -243,3 +252,5 @@ CREATE INDEX idx_purchase_product_date ON purchase_payments(product_id, purchase
 CREATE INDEX idx_purchase_account ON purchase_payments(account_id);
 
 ANALYZE;
+
+RESET client_min_messages;
