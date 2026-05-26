@@ -172,6 +172,9 @@ JOIN accounts AS a ON a.member_id = fm.member_id
 CROSS JOIN generate_series(0, 27) AS month_no
 ORDER BY fm.member_id, month_no;
 
+DROP TABLE IF EXISTS tmp_members;
+DROP TABLE IF EXISTS tmp_products;
+
 CREATE TEMP TABLE tmp_members AS
 SELECT
     row_number() OVER (ORDER BY member_id) AS rn,
