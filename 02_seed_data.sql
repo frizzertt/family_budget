@@ -40,8 +40,14 @@ INSERT INTO family_members (
 WITH names AS (
     SELECT
         ARRAY['Иванов', 'Петров', 'Сидоров', 'Смирнов', 'Кузнецов', 'Попов', 'Васильев', 'Соколов'] AS last_names,
-        ARRAY['Алексей', 'Дмитрий', 'Сергей', 'Михаил'] AS male_names,
-        ARRAY['Анна', 'Мария', 'Елена', 'Ольга'] AS female_names
+        ARRAY['Алексей', 'Дмитрий', 'Сергей', 'Михаил', 'Андрей', 'Николай', 'Павел', 'Илья'] AS father_names,
+        ARRAY['Алексеевич', 'Дмитриевич', 'Сергеевич', 'Михайлович', 'Андреевич', 'Николаевич', 'Павлович', 'Ильич'] AS child_patronymics_male,
+        ARRAY['Алексеевна', 'Дмитриевна', 'Сергеевна', 'Михайловна', 'Андреевна', 'Николаевна', 'Павловна', 'Ильинична'] AS child_patronymics_female,
+        ARRAY['Иванович', 'Петрович', 'Викторович', 'Олегович'] AS adult_patronymics_male,
+        ARRAY['Ивановна', 'Петровна', 'Викторовна', 'Олеговна'] AS adult_patronymics_female,
+        ARRAY['Артем', 'Кирилл', 'Максим', 'Егор', 'Даниил', 'Роман'] AS son_names,
+        ARRAY['Анна', 'Мария', 'Елена', 'Ольга', 'Алина', 'Виктория'] AS mother_names,
+        ARRAY['Дарья', 'София', 'Полина', 'Екатерина', 'Ксения', 'Варвара'] AS daughter_names
 )
 SELECT
     f.family_id,
@@ -50,12 +56,16 @@ SELECT
         ELSE last_names[1 + (((f.family_id - 1) % cardinality(last_names))::integer)]
     END AS last_name,
     CASE
-        WHEN pos IN (1, 3) THEN male_names[1 + (((f.family_id + pos - 2) % cardinality(male_names))::integer)]
-        ELSE female_names[1 + (((f.family_id + pos - 2) % cardinality(female_names))::integer)]
+        WHEN pos = 1 THEN father_names[1 + (((f.family_id - 1) % cardinality(father_names))::integer)]
+        WHEN pos = 2 THEN mother_names[1 + (((f.family_id - 1) % cardinality(mother_names))::integer)]
+        WHEN pos = 3 THEN son_names[1 + (((f.family_id - 1) % cardinality(son_names))::integer)]
+        ELSE daughter_names[1 + (((f.family_id - 1) % cardinality(daughter_names))::integer)]
     END AS first_name,
     CASE
-        WHEN pos IN (1, 3) THEN 'Алексеевич'
-        ELSE 'Алексеевна'
+        WHEN pos = 1 THEN adult_patronymics_male[1 + (((f.family_id - 1) % cardinality(adult_patronymics_male))::integer)]
+        WHEN pos = 2 THEN adult_patronymics_female[1 + (((f.family_id + 1) % cardinality(adult_patronymics_female))::integer)]
+        WHEN pos = 3 THEN child_patronymics_male[1 + (((f.family_id - 1) % cardinality(father_names))::integer)]
+        ELSE child_patronymics_female[1 + (((f.family_id - 1) % cardinality(father_names))::integer)]
     END AS middle_name,
     CASE pos
         WHEN 1 THEN 'отец'
